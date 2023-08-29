@@ -20,18 +20,14 @@ TinyGPT To Generate Poetry 终端版。
 @Author :sunjunyi
 @Time   :2023/8/29 12:11
 """
-
+from test import load_model, infer
 import os
 import time
-import random
 from rich import box
 from rich.table import Table
 from rich.align import Align
 from rich.console import Console
 from rich.progress import track
-
-import torch
-import torch.nn.functional as F
 
 # from iTrainingLogger import iSummaryWriter
 
@@ -42,16 +38,17 @@ MODEL_CONFIG = {
 MIN_REWARD = -2.0
 MAX_REWARD = 2.0
 
-LOG_PATH = './logs'
-LOG_NAME = 'Terminal-Human-Feedback'
+
+# LOG_PATH = './logs'
+# LOG_NAME = 'Terminal-Human-Feedback'
 # writer = iSummaryWriter(log_path=LOG_PATH, log_name=LOG_NAME)
 
-prompts = [
-    '刚收到货，感觉',
-    '这部电影很',
-    '说实话，真的很',
-    '这次购物总的来说体验很'
-]
+# prompts = [
+#     '刚收到货，感觉',
+#     '这部电影很',
+#     '说实话，真的很',
+#     '这次购物总的来说体验很'
+# ]
 
 
 def main():
@@ -78,9 +75,9 @@ def main():
     for k, v in MODEL_CONFIG.items():
         table.add_row(k, v)
 
-    table.add_row('log path', os.path.join(LOG_PATH, LOG_NAME))
-    table.add_row('min ~ max reward', f'{MIN_REWARD} ~ {MAX_REWARD}')
-    table.add_row('prompts', f'{prompts}')
+    # table.add_row('log path', os.path.join(LOG_PATH, LOG_NAME))
+    # table.add_row('min ~ max reward', f'{MIN_REWARD} ~ {MAX_REWARD}')
+    # table.add_row('prompts', f'{prompts}')
 
     # 添加table描述
     table.caption = "You can change config in [b not dim]Source Code[/]"
@@ -102,8 +99,8 @@ def main():
 
     # 加载环境
     with console.status("[bold bright_green]Initializing Model & Env..."):
-        # TODO:
-        time.sleep(1)
+        # TODO: 导入模型权重
+        model, encode, decode, ctx = load_model()
         console.log('[bold magenta][Done] Initialized Model & Env.')
 
     step = 1
@@ -118,10 +115,11 @@ def main():
             continue
 
         with console.status("[bold bright_green]Generating results..."):
-            time.sleep(1)
+            # TODO: 推理
+            response = infer(model, current_prompt, encode, decode, ctx)
 
-        console.print(f'[bright_blue]💬(Response) >>> {current_prompt} [/bright_blue]')
-        reward_txt = console.input(f'[bright_cyan]🏆(Reward) ({MIN_REWARD} ~ {MAX_REWARD}): [/bright_cyan]')
+        console.print(f'[bright_blue]💬(Response) >>> {response} [/bright_blue]')
+        # reward_txt = console.input(f'[bright_cyan]🏆(Reward) ({MIN_REWARD} ~ {MAX_REWARD}): [/bright_cyan]')
 
         with console.status("[bold bright_green]Updating Model..."):
             time.sleep(1)

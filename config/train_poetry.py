@@ -6,7 +6,7 @@
 """
 # train a miniature character-level model
 # good for debugging and playing on macbooks and such
-
+# 网络模型输出文件夹
 out_dir = 'out-poetry'
 eval_interval = 250  # keep frequent because we'll overfit
 eval_iters = 200
@@ -19,12 +19,14 @@ wandb_log = False  # override via command line if you like
 wandb_project = 'poetry'
 wandb_run_name = 'mini-gpt'
 
+# 数据文件夹名称
 dataset = 'poetry'
 gradient_accumulation_steps = 1
 batch_size = 8
 block_size = 256  # context of up to 256 previous characters
 
 # baby GPT model :)
+# GPT模型的大小
 n_layer = 4
 n_head = 4
 n_embd = 64

@@ -32,12 +32,15 @@ class CausalSelfAttention(nn.Module):
 
     def __init__(self, config):
         super().__init__()
+        # 由于这个代码使用的是将embedding切分成n_head份实现multi head，因此需要n_head的大小整除embedding的大小
         assert config.n_embd % config.n_head == 0
         # key, query, value projections for all heads, but in a batch
+        # 得到经过线性层进行变换后的key，value，query
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
         # output projection
         self.c_proj = nn.Linear(config.n_embd, config.n_embd, bias=config.bias)
         # regularization
+        # 正则化，防止过拟合
         self.attn_dropout = nn.Dropout(config.dropout)
         self.resid_dropout = nn.Dropout(config.dropout)
         self.n_head = config.n_head
@@ -48,6 +51,7 @@ class CausalSelfAttention(nn.Module):
         if not self.flash:
             print("WARNING: using slow attention. Flash Attention requires PyTorch >= 2.0")
             # causal mask to ensure that attention is only applied to the left in the input sequence
+            # 使用tril得到mask矩阵
             self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size))
                                  .view(1, 1, config.block_size, config.block_size))
 
@@ -55,7 +59,11 @@ class CausalSelfAttention(nn.Module):
         B, T, C = x.size()  # batch size, sequence length, embedding dimensionality (n_embd)
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
+        # 把输入经过线性层得到的矩阵切分，得到qkv三个矩阵
         q, k, v = self.c_attn(x).split(self.n_embd, dim=2)
+        # 再将k，q，v的embedding分给每个head
+        # 矩阵的形状变化：(batch_size, sequence_length, embedding_dimensionality) -> (batch_size, n_head, sequence_length, embedding_dimensionality // n_head)
+        # k和q负责计算attention score，v是每个token的embedding
         k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  # (B, nh, T, hs)
         q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  # (B, nh, T, hs)
         v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  # (B, nh, T, hs)
@@ -68,11 +76,18 @@ class CausalSelfAttention(nn.Module):
                                                                  is_causal=True)
         else:
             # manual implementation of attention
+            # 计算了每一对token的Q和K的缩放点积，从而得到每对token之间的attention score
+            # att矩阵形状： (batch_size, n_head, sequence_length, sequence_length)
             att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+            # mask操作，使得每个token和它自己之后token计算出来的attention score被mask掉，从而不会让前面的token得到后面token的相关信息
             att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float('-inf'))
+            # 归一化得到0-1之间的score
             att = F.softmax(att, dim=-1)
             att = self.attn_dropout(att)
+            # 通过attention score乘上每个token的embedding，每个token的embedding为它所在的sequence embedding的加权和，这样每个embedding都得到了关于整个句子的信息
             y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
+
+        # 最后把n个head连起来，恢复成(batch_size, sequence_length, embedding_dimensionality)的形式
         y = y.transpose(1, 2).contiguous().view(B, T, C)  # re-assemble all head outputs side by side
 
         # output projection
