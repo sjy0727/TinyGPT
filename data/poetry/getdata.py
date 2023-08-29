@@ -1,4 +1,4 @@
- #!/usr/bin/env python
+# !/usr/bin/env python
 # -*- encoding : utf-8 -*-
 """
 @Author :sunjunyi
@@ -21,6 +21,7 @@
 import glob
 import json
 import os
+
 # /Users/sunjunyi/PycharmProjects/chinese-poetry/诗经/shijing.json
 # TODO:修改路径
 datas_json_path_list = glob.glob("/Users/sunjunyi/PycharmProjects/chinese-poetry/全唐诗/poet*.json")  # 1. 匹配所有唐诗json文件

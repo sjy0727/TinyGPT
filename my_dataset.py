@@ -26,9 +26,11 @@ class QuestionAnswerDataset(Dataset):
 
     def collate_fn(self, batch):
         texts = batch
-        input_ids = torch.tensor(list(map(lambda s: qa_enc.encode(s, allowed_special='all'))))
-        start_pos =
+        tokens = np.array(list(map(lambda s: qa_enc.encode(s, allowed_special='all'))))
+        input_ids = torch.tensor(tokens)
+        start_pos = input_ids[:, qa_enc._special_tokens['<|endoftext|>']]
 
 
 if __name__ == '__main__':
-    print(qa_enc._special_tokens['<|endoftext|>'])  # {'<|endoftext|>': 50256, '<|sepoftext|>': 50257, '<|padoftext|>': 50258}
+    print(qa_enc._special_tokens[
+              '<|endoftext|>'])  # {'<|endoftext|>': 50256, '<|sepoftext|>': 50257, '<|padoftext|>': 50258}

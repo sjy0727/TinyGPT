@@ -30,8 +30,12 @@ $ python train.py \
 * compile: 使用 PyTorch2.0 中的 torch.compile() 加速模型训练，默认为 "True"，若在 PyTorch < 2.0 环境中运行，则需设置为 "
   False"
 
+```bash
+$ python train.py config/train_poetry.py
+```
+
 # 推理
 
 ```bash
-$ python sample.py  --num_samples=1 --out_dir=out-poetry-char --device=mps
+$ python sample.py  --num_samples=1 --out_dir=out-poetry --device=mps
 ```
