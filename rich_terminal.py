@@ -112,14 +112,14 @@ def main():
         console.print(f'[ Step {step} ]')
         current_prompt = console.input(f'[bright_yellow]📖(Prompt) <<< [/bright_yellow]')
 
-        if current_prompt == 'clear()' or current_prompt == '\n':
+        if current_prompt == 'clear()' or current_prompt == '':
             console.clear()
             console.print(table_centered)
             continue
 
         with console.status("[bold bright_green]Generating results..."):
             # TODO: 推理
-            response = infer(model, current_prompt, encode, decode, ctx)
+            response = infer(model, current_prompt, encode, decode, ctx, 12 * 4 - len(current_prompt))
 
         console.print(f'[bright_blue]💬(Response) >>> {response} [/bright_blue]')
         # reward_txt = console.input(f'[bright_cyan]🏆(Reward) ({MIN_REWARD} ~ {MAX_REWARD}): [/bright_cyan]')

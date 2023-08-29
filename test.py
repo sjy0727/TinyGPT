@@ -87,7 +87,7 @@ def load_model():
     return model, encode, decode, ctx
 
 
-def infer(model, start, encode, decode, ctx):
+def infer(model, start, encode, decode, ctx, max_new_tokens):
     # encode the beginning of the prompt
     if start.startswith('FILE:'):
         with open(start[5:], 'r', encoding='utf-8') as f:
@@ -101,4 +101,3 @@ def infer(model, start, encode, decode, ctx):
             for k in range(num_samples):
                 y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
                 return decode(y[0].tolist())
-
