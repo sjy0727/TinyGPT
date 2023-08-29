@@ -58,7 +58,7 @@ def main():
     主函数。
     """
     console = Console()
-    table = Table(show_footer=False)
+    table = Table(show_footer=False, show_header=True, header_style="bold magenta")
     table.width = console.width
     table.box = box.SQUARE
     table.row_styles = ["none", "dim"]
@@ -66,60 +66,61 @@ def main():
 
     # add title
     table.title = (
-        "[bold not italic]:robot:[/] Reinforcemnet Learning from Human Feedback - Terminal"
+        "[bold not italic]:robot:[/] TinyGPT to generate poetry - Terminal"
     )
 
     # add column (first line)
-    table.add_column("config/key", no_wrap=True)
-    table.add_column("config/value", no_wrap=True)
+    table.add_column("config/key", no_wrap=True, justify='center')
+    table.add_column("config/value", no_wrap=True, justify='center')
 
     # add config row to table
     for k, v in MODEL_CONFIG.items():
         table.add_row(k, v)
+
     table.add_row('log path', os.path.join(LOG_PATH, LOG_NAME))
     table.add_row('min ~ max reward', f'{MIN_REWARD} ~ {MAX_REWARD}')
     table.add_row('prompts', f'{prompts}')
+
+    # 添加table描述
     table.caption = "You can change config in [b not dim]Source Code[/]"
 
+    # table第一列风格
     table.columns[0].style = "bright_red"
     table.columns[0].header_style = "bold bright_red"
+
+    # table第二列风格
     table.columns[1].style = "bright_green"
     table.columns[1].header_style = "bold bright_green"
+
     table_centered = Align.center(table)
     console.print(table_centered)
 
     with console.status("[bold bright_green]Initializing Model & Env..."):
         # TODO:
+        time.sleep(1)
         console.log('[bold magenta][Done] Initialized Model & Env.')
 
     step = 1
     t = time.time()
     while True:
-        current_prompt = random.choice(prompts)
-        console.print(f'[Step {step}]')
-        console.print(f'[bright_yellow]prompt>>> {current_prompt}[/bright_yellow]')
-        console.print('generating results...', end='\r')
-        # query_tensor = tokenizer.encode(current_prompt, return_tensors="pt").to(MODEL_CONFIG['device'])
-        # response_tensor = respond_to_batch(model, query_tensor)
-        # response_txt = tokenizer.decode(response_tensor[0, :].to('cpu'))
+        console.print(f'[ Step {step} ]')
+        current_prompt = console.input(f'[bright_yellow]📖(Prompt) <<< [/bright_yellow]')
 
-        console.print(f'[bright_blue]result>>> response_txt[/bright_blue]')
-        reward_txt = input(f'Reward ({MIN_REWARD} ~ {MAX_REWARD}): ')
-        while True:
-            try:
-                reward_f = float(reward_txt)
-                if MIN_REWARD <= reward_f <= MAX_REWARD:
-                    break
-                else:
-                    reward_txt = input(f'Reward ({MIN_REWARD} ~ {MAX_REWARD}): ')
-            except:
-                reward_txt = input(f'Reward ({MIN_REWARD} ~ {MAX_REWARD}): ')
-        # reward = [torch.tensor(reward_f).to(MODEL_CONFIG['device'])]
+        if current_prompt == 'clear()':
+            console.clear()
+            console.print(table_centered)
+            continue
+
+        with console.status("[bold bright_green]Generating results..."):
+            time.sleep(1)
+
+        console.print(f'[bright_blue]💬(Response) >>> {current_prompt} [/bright_blue]')
+        reward_txt = console.input(f'[bright_cyan]🏆(Reward) ({MIN_REWARD} ~ {MAX_REWARD}): [/bright_cyan]')
 
         with console.status("[bold bright_green]Updating Model..."):
-            pass
-
-
+            time.sleep(1)
+            console.log('[bold magenta][Done] Updated Model.')
+            step += 1
 
 
 if __name__ == '__main__':
