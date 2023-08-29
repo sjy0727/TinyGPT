@@ -41,9 +41,3 @@ warmup_iters = 100  # not super necessary potentially
 # on macbook also add
 device = 'mps'  # run on cpu only
 compile = False  # do not torch compile the model
-
-if __name__ == '__main__':
-    import tiktoken
-    enc = tiktoken.get_encoding("p50k_base")
-    print(enc.special_tokens_set)
-    print(tiktoken.list_encoding_names())

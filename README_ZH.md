@@ -1,10 +1,11 @@
 # 开始训练
 
-https://zhuanlan.zhihu.com/p/601044938
+* https://zhuanlan.zhihu.com/p/601044938
+* https://blog.yanjingang.com/?p=7102#41
 
 ```bash
 $ python train.py \
-       --dataset=shakespeare \
+       --dataset=poetry_char \
        --n_layer=4 \
        --n_head=4 \
        --n_embd=64 \
