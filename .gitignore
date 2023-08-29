@@ -152,3 +152,4 @@ cython_debug/
 .idea/
 ./data/*/*.pkl
 ./data/*/*.bin
+.DS_STORE
