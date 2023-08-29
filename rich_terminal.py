@@ -11,11 +11,11 @@
 │├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────┬───┤│
 ││ Shift  │ Z │ X │ C │ V │ B │ N │ M │< ,│> .│? /│Shift │Fn ││
 │└─────┬──┴┬──┴──┬┴───┴───┴───┴───┴───┴──┬┴───┴┬──┴┬─────┴───┘│
-│      │Fn │ Alt │         Space         │ Alt │Win│   HHKB   │
+│      │Fn │ Alt │         Space         │ Alt │Win│          │
 │      └───┴─────┴───────────────────────┴─────┴───┘          │
 └─────────────────────────────────────────────────────────────┘
 
-Reinforcemnet Learning from Human Feedback 终端版。
+TinyGPT To Generate Poetry 终端版。
 
 @Author :sunjunyi
 @Time   :2023/8/29 12:11
@@ -28,6 +28,7 @@ from rich import box
 from rich.table import Table
 from rich.align import Align
 from rich.console import Console
+from rich.progress import track
 
 import torch
 import torch.nn.functional as F
@@ -66,7 +67,7 @@ def main():
 
     # add title
     table.title = (
-        "[bold not italic]:robot:[/] TinyGPT to generate poetry - Terminal"
+        "[bold not italic]:robot:[/] TinyGPT To Generate Poetry - Terminal"
     )
 
     # add column (first line)
@@ -95,6 +96,11 @@ def main():
     table_centered = Align.center(table)
     console.print(table_centered)
 
+    # 进度条
+    for _ in track(range(100)):
+        time.sleep(0.01)
+
+    # 加载环境
     with console.status("[bold bright_green]Initializing Model & Env..."):
         # TODO:
         time.sleep(1)
