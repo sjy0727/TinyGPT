@@ -4,6 +4,7 @@
 @Author :sunjunyi
 @Time   :2023/8/29 11:40
 """
+import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 from CustomTokenizer import qa_enc

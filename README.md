@@ -4,6 +4,8 @@
 
 * https://zhuanlan.zhihu.com/p/601044938
 * https://blog.yanjingang.com/?p=7102#41
+* https://colab.research.google.com/github/huggingface/notebooks/blob/main/examples/question_answering.ipynb
+* https://www.philschmid.de/fine-tune-a-non-english-gpt-2-model-with-huggingface
 
 ```bash
 $ python train.py \

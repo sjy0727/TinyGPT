@@ -7,6 +7,7 @@
 
 import os
 import pickle
+import time
 from contextlib import nullcontext
 import torch
 import tiktoken
@@ -101,3 +102,18 @@ def infer(model, start, encode, decode, ctx, max_new_tokens):
             for k in range(num_samples):
                 y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
                 return decode(y[0].tolist())
+
+def infer_iter(model, start, encode, decode, ctx, max_new_tokens):
+    # encode the beginning of the prompt
+    if start.startswith('FILE:'):
+        with open(start[5:], 'r', encoding='utf-8') as f:
+            start = f.read()
+    start_ids = encode(start)
+    x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
+
+    # run generation
+    with torch.no_grad():
+        with ctx:
+            for y in model.generate_iter(x, max_new_tokens, temperature=temperature, top_k=top_k):
+                time.sleep(0.1)
+                yield decode(y[0].tolist())

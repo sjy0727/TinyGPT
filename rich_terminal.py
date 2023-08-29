@@ -20,7 +20,7 @@ TinyGPT To Generate Poetry 终端版。
 @Author :sunjunyi
 @Time   :2023/8/29 12:11
 """
-from test import load_model, infer
+from test import load_model, infer, infer_iter
 import os
 import time
 from rich import box
@@ -28,6 +28,8 @@ from rich.table import Table
 from rich.align import Align
 from rich.console import Console
 from rich.progress import track
+from rich.live import Live
+from rich.spinner import Spinner
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -117,16 +119,16 @@ def main():
             console.print(table_centered)
             continue
 
-        with console.status("[bold bright_green]Generating results..."):
+        # with console.status("[bold bright_green]Generating results...\n"):
             # TODO: 推理
-            response = infer(model, current_prompt, encode, decode, ctx, 12 * 4 - len(current_prompt))
-
-        console.print(f'[bright_blue]💬(Response) >>> {response} [/bright_blue]')
+        with Live() as live:
+            for response in infer_iter(model, current_prompt, encode, decode, ctx, 12 * 4 - len(current_prompt)):
+                live.update(f'[bright_blue]💬(Response) >>> {response} [/bright_blue]')
         # reward_txt = console.input(f'[bright_cyan]🏆(Reward) ({MIN_REWARD} ~ {MAX_REWARD}): [/bright_cyan]')
 
         with console.status("[bold bright_green]Updating Model..."):
             time.sleep(1)
-            console.log('[bold magenta][Done] Updated Model.')
+            console.log('[bold magenta][Done] 👨🏻‍🍳Updated Model.')
             step += 1
 
 
