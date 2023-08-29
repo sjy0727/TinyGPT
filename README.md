@@ -33,7 +33,7 @@ $ python train.py \
   False"
 
 ```bash
-$ python train.py config/train_poetry.py
+$ python train.py config/train_poetry_char.py
 ```
 
 ## 推理

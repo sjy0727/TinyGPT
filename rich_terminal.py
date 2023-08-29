@@ -28,6 +28,9 @@ from rich.table import Table
 from rich.align import Align
 from rich.console import Console
 from rich.progress import track
+import warnings
+
+warnings.filterwarnings('ignore')
 
 # from iTrainingLogger import iSummaryWriter
 
@@ -109,7 +112,7 @@ def main():
         console.print(f'[ Step {step} ]')
         current_prompt = console.input(f'[bright_yellow]📖(Prompt) <<< [/bright_yellow]')
 
-        if current_prompt == 'clear()':
+        if current_prompt == 'clear()' or current_prompt == '\n':
             console.clear()
             console.print(table_centered)
             continue

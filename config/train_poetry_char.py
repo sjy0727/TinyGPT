@@ -21,7 +21,7 @@ wandb_run_name = 'mini-gpt'
 
 dataset = 'poetry_char'
 gradient_accumulation_steps = 1
-batch_size = 8
+batch_size = 32
 block_size = 256  # context of up to 256 previous characters
 
 # baby GPT model :)
