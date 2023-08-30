@@ -23,6 +23,7 @@ dataset = 'poetry_char'
 gradient_accumulation_steps = 1
 batch_size = 32
 block_size = 256  # context of up to 256 previous characters
+vocab_size = 21184  # bert-base-chinese词表中的字典大小 64倍向上取整
 
 # baby GPT model :)
 n_layer = 4

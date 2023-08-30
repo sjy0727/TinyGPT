@@ -14,6 +14,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+from torch.nn.modules.loss import CrossEntropyLoss
 
 
 class LayerNorm(nn.Module):
@@ -154,6 +155,7 @@ class GPT(nn.Module):
             ln_f=LayerNorm(config.n_embd, bias=config.bias),
         ))
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+        self.qa_outputs = nn.Linear(config.n_embd, 2)
         # with weight tying when using torch.compile() some warnings get generated:
         # "UserWarning: functional_call was passed multiple values for tied weights.
         # This behavior is deprecated and will be an error in future versions"
@@ -204,12 +206,45 @@ class GPT(nn.Module):
             x = block(x)
         x = self.transformer.ln_f(x)
 
+        # if task == 'QA':
+        #     # sequence_output shape (batch_size, seq_len, n_embed)
+        #     sequence_output = x
+        #     # logits shape (batch_size, seq_len, 2)
+        #     logits = self.qa_outputs(sequence_output)
+        #     # start_logits shape (batch_size, seq_len, 1)
+        #     start_logits, end_logits = logits.split(1, dim=-1)
+        #     # start_logits shape (batch_size, seq_len)
+        #     start_logits = start_logits.squeeze(-1).contiguous()
+        #     end_logits = end_logits.squeeze(-1).contiguous()
+        #
+        #     loss = None
+        #     # start_positions shape (batch_size,) 每个值是
+        #     if start_positions is not None and end_positions is not None:
+        #         # If we are on multi-GPU, split add a dimension
+        #         if len(start_positions.size()) > 1:
+        #             start_positions = start_positions.squeeze(-1).to(start_logits.device)
+        #         if len(end_positions.size()) > 1:
+        #             end_positions = end_positions.squeeze(-1).to(end_logits.device)
+        #
+        #         # sometimes the start/end positions are outside our model inputs, we ignore these terms
+        #         ignored_index = start_logits.size(1)  # ignored_index = seq_len 词的长度
+        #         start_positions = start_positions.clamp(0, ignored_index)
+        #         end_positions = end_positions.clamp(0, ignored_index)
+        #
+        #         loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
+        #         # start_positions是0~seq_len之间的数
+        #         start_loss = loss_fct(start_logits, start_positions)  # start_positions是0~seq_len之间的数
+        #         end_loss = loss_fct(end_logits, end_positions)
+        #         loss = (start_loss + end_loss) / 2
+        # else:
         if targets is not None:
             # if we are given some desired targets also calculate the loss
-            logits = self.lm_head(x)
+            logits = self.lm_head(x)  # (batch_size, seq_len, vocab_size)
+            # 计算loss是logits的shape (batch_size * seq_len, vocab_size)
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1)
         else:
             # inference-time mini-optimization: only forward the lm_head on the very last position
+            # logits shape (batch_size, 1, vocab_size)
             logits = self.lm_head(x[:, [-1], :])  # note: using list [-1] to preserve the time dim
             loss = None
 
@@ -346,7 +381,7 @@ class GPT(nn.Module):
             # apply softmax to convert logits to (normalized) probabilities
             probs = F.softmax(logits, dim=-1)
             # sample from the distribution
-            idx_next = torch.multinomial(probs, num_samples=1)
+            idx_next = torch.multinomial(probs, num_samples=1)  # 从概率中采样，不直接采取最高概率的词
             # append sampled index to the running sequence and continue
             idx = torch.cat((idx, idx_next), dim=1)
 

@@ -6,6 +6,7 @@
 * https://blog.yanjingang.com/?p=7102#41
 * https://colab.research.google.com/github/huggingface/notebooks/blob/main/examples/question_answering.ipynb
 * https://www.philschmid.de/fine-tune-a-non-english-gpt-2-model-with-huggingface
+* https://www.iotword.com/10240.html (最重要的关键文章)
 
 ```bash
 $ python train.py \

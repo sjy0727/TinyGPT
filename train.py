@@ -131,8 +131,9 @@ val_data = np.memmap(os.path.join(data_dir, 'val.bin'), dtype=np.uint16, mode='r
 
 def get_batch(split):
     data = train_data if split == 'train' else val_data
-    ix = torch.randint(len(data) - block_size, (batch_size,))  # 除了最后一个block代表结束占位符，
-    x = torch.stack([torch.from_numpy((data[i:i + block_size]).astype(np.int64)) for i in ix])
+    ix = torch.randint(len(data) - block_size, (batch_size,))  # block_size代表上下文记忆的长度
+    # y是x对应下一个时间步的文本
+    x = torch.stack([torch.from_numpy((data[i:i + block_size]).astype(np.int64)) for i in ix]) # 0 <= i < (训练集所有字-上下文记忆长度)
     y = torch.stack([torch.from_numpy((data[i + 1:i + 1 + block_size]).astype(np.int64)) for i in ix])
     if device_type == 'cuda':
         # pin arrays x,y, which allows us to move them to GPU asynchronously (non_blocking=True)
