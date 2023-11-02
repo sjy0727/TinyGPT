@@ -39,9 +39,10 @@ for data_json_path in datas_json_path_list:  # 2. 处理匹配的每一个文件
         for each_ts in ts_data:  # 3. 处理文件中每段数据，只要五言诗和2句的
             paragraphs_list = each_ts["paragraphs"]
             # 只要两句的, 且是五言诗, 一句10字外加两个标点, 共12
+            title = each_ts["title"]
             if len(paragraphs_list) == 2 and len(paragraphs_list[0]) == 12 and len(paragraphs_list[1]) == 12:
                 with open("tang_poet.txt", "a", encoding="utf-8") as f2:
-                    f2.write("".join(paragraphs_list))
+                    f2.write('[Q]' + title + '[A]' + "".join(paragraphs_list) + '[END]')
                     f2.write("\n")
 f = open("tang_poet.txt", "r", encoding="utf-8")
 print(len(f.readlines()))
